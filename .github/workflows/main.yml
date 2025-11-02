@@ -3,30 +3,32 @@ name: Deploy Website
 on:
   push:
     branches:
-      - main  # Run workflow on push to main branch
+      - main  # or 'master', depending on your default branch
+
+permissions:
+  contents: write
 
 jobs:
-  build-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js (optional, if you have JS build)
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # Uncomment these steps if you have a build process (React/Vue/etc)
-      # - name: Install dependencies
-      #   run: npm install
-      #
-      # - name: Build project
-      #   run: npm run build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v6
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./  # Use ./ for static HTML, or ./build for React/Vue
+          publish_dir: ./dist  # or ./build for React
